@@ -10,7 +10,9 @@ const trpc = createTRPCProxyClient<AppRouter>({
 });
 
 async function server() {
-  const users = await trpc.userList.query();
+  const users = await trpc.userCreate.mutate({
+    name: "test",
+  });
   console.log("Users:", users);
 }
 

@@ -4,22 +4,20 @@ import { db } from "@truesnap/db";
 import { publicProcedure, router } from "./trpc";
 import cors from "cors";
 
+const userCollection = db.collection("User");
+
+
 const appRouter = router({
-  userList: publicProcedure.query(async () => {
-    console.log('9')
-    const users = await db.user.findMany();
-    return users;
-  }),
-  userById: publicProcedure.input(z.string()).query(async (opts) => {
-    const { input } = opts;
-    const user = await db.user.findById(input);
-    return user;
-  }),
   userCreate: publicProcedure
     .input(z.object({ name: z.string() }))
     .mutation(async (opts) => {
       const { input } = opts;
-      const user = await db.user.create(input);
+
+      const user = await userCollection.create([
+        input.name,
+        input.name, 
+      ]);
+
       return user;
     }),
 });
