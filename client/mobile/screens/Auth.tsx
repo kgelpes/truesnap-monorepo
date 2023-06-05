@@ -15,18 +15,7 @@ import {
 } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
-const App = () => {
-  return (
-    <ThirdwebProvider
-      activeChain="mumbai"
-      supportedWallets={[metamaskWallet(), rainbowWallet(), localWallet()]}
-    >
-      <AppInner />
-    </ThirdwebProvider>
-  );
-};
-
-const AppInner = () => {
+const WalletScreen = () => {
   const isDarkMode = useColorScheme() === "dark";
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -62,4 +51,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default WalletScreen;

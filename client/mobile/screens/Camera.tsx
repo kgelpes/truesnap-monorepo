@@ -34,13 +34,18 @@ import Stack from "../components/Stack";
 import * as FileSystem from "expo-file-system";
 import Constants from "expo-constants";
 import server from "../server";
+import { CameraScreenNavigationProp } from "../Router";
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 Reanimated.addWhitelistedNativeProps({
   zoom: true,
 });
 
-export default function App() {
+export default function CameraScreen({
+  navigation,
+}: {
+  navigation: CameraScreenNavigationProp;
+}) {
   const camera = useRef<Camera>(null);
   const [isCameraInitialized, setIsCameraInitialized] = useState(false);
   const zoom = useSharedValue(1);
@@ -236,7 +241,7 @@ export default function App() {
         </Text>
         <TouchableOpacity
           onPress={async () => {
-            const res = await server();
+            navigation.navigate("Wallet");
           }}
         >
           <Ionicons name="person-outline" size={24} color="white" />
