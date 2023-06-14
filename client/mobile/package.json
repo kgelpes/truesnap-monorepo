@@ -8,7 +8,9 @@
     "iphone": "expo run:ios --device"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "^1.18.1",
+    "@expo/config-plugins": "~6.0.0",
+    "@expo/vector-icons": "^13.0.0",
+    "@react-native-async-storage/async-storage": "1.17.11",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
     "@thirdweb-dev/react-native": "^0.2.17",
@@ -19,6 +21,7 @@
     "cors": "^2.8.5",
     "ethers": "^5",
     "expo": "~48.0.18",
+    "expo-clipboard": "~4.1.2",
     "expo-constants": "~14.2.1",
     "expo-file-system": "~15.2.2",
     "expo-linking": "~4.0.1",
@@ -31,16 +34,16 @@
     "react-native": "0.71.8",
     "react-native-crypto": "^2.2.0",
     "react-native-gesture-handler": "~2.9.0",
-    "react-native-get-random-values": "^1.9.0",
     "react-native-mmkv": "^2.8.0",
     "react-native-randombytes": "^3.6.1",
     "react-native-reanimated": "~2.14.4",
     "react-native-safe-area-context": "4.5.0",
     "react-native-screens": "~3.20.0",
     "react-native-static-safe-area-insets": "^2.2.0",
-    "react-native-svg": "^13.9.0",
+    "react-native-svg": "13.4.0",
     "react-native-vision-camera": "^2.15.4",
-    "text-encoding": "^0.7.0"
+    "text-encoding": "^0.7.0",
+    "react-native-get-random-values": "~1.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

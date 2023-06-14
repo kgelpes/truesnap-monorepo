@@ -8,7 +8,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@thirdweb-dev/auth": "^3.1.1",
     "@trpc/server": "^10.29.0",
-    "@truesnap/db": "*"
+    "@truesnap/db": "*",
+    "cookie-parser": "^1.4.6",
+    "ethers": "^5.7.2",
+    "express": "^4.18.2",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17"
   }
 }

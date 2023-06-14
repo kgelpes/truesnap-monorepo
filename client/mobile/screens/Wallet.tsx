@@ -4,6 +4,7 @@ import {
   metamaskWallet,
   rainbowWallet,
   ThirdwebProvider,
+  useSDK,
 } from "@thirdweb-dev/react-native";
 import React from "react";
 import {
@@ -13,9 +14,13 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import { Colors } from "react-native/Libraries/NewAppScreen";
+import { useLogin } from "@thirdweb-dev/react-native";
 
 const WalletScreen = () => {
+  const { isLoading, login } = useLogin();
+
   const isDarkMode = useColorScheme() === "dark";
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -26,11 +31,24 @@ const WalletScreen = () => {
     ...styles.heading,
   };
 
+  const handleSignMessage = async () => {
+    try {
+      const token = await login();
+      console.log("token:", token);
+    } catch (error) {
+      console.log("login error:", error);
+    }
+  };
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <View style={styles.view}>
         <Text style={textStyles}>React Native thirdweb starter</Text>
         <ConnectWallet />
+
+        <TouchableOpacity onPress={handleSignMessage}>
+          <Text>{isLoading ? "Loading..." : "Sign in with Ethereum"}</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

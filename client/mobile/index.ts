@@ -1,15 +1,6 @@
 import "@thirdweb-dev/react-native-compat";
+
 import { registerRootComponent } from "expo";
-
-const TextEncodingPolyfill = require("text-encoding");
-const BigInt = require("big-integer");
-
-Object.assign(global, {
-  TextEncoder: TextEncodingPolyfill.TextEncoder,
-  TextDecoder: TextEncodingPolyfill.TextDecoder,
-  BigInt: BigInt,
-});
-
 
 import App from "./App";
 
