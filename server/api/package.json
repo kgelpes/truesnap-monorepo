@@ -9,7 +9,7 @@
   "license": "ISC",
   "dependencies": {
     "@thirdweb-dev/auth": "^3.1.1",
-    "@trpc/server": "^10.29.0",
+    "@trpc/server": "^10.30.0",
     "@truesnap/db": "*",
     "cookie-parser": "^1.4.6",
     "ethers": "^5.7.2",

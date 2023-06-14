@@ -32,9 +32,8 @@ import Reanimated, {
 import { MAX_ZOOM_FACTOR } from "../Constants";
 import Stack from "../components/Stack";
 import * as FileSystem from "expo-file-system";
-import Constants from "expo-constants";
-import server from "../server";
 import { CameraScreenNavigationProp } from "../Router";
+import { trpc } from "../trpc";
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 Reanimated.addWhitelistedNativeProps({
@@ -46,6 +45,8 @@ export default function CameraScreen({
 }: {
   navigation: CameraScreenNavigationProp;
 }) {
+  const userAddImageHash = trpc.userAddImageHash.useMutation();
+
   const camera = useRef<Camera>(null);
   const [isCameraInitialized, setIsCameraInitialized] = useState(false);
   const zoom = useSharedValue(1);
@@ -162,7 +163,9 @@ export default function CameraScreen({
         encoding: FileSystem.EncodingType.Base64,
       });
 
-      console.log("photo as string", photoAsString);
+      userAddImageHash.mutate({
+        imageHash: photoAsString,
+      });
     } else {
       console.log("camera not initialized");
     }

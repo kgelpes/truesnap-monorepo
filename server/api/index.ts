@@ -1,22 +1,24 @@
 import { z } from "zod";
-import { createUser, db, getUser } from "@truesnap/db";
-import { inferAsyncReturnType, initTRPC } from "@trpc/server";
+import { addImageHash, db } from "@truesnap/db";
+import { TRPCError, inferAsyncReturnType, initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import express from "express";
 import cors from "cors";
-import { ThirdwebAuth } from "@thirdweb-dev/auth/express";
-import { PrivateKeyWallet } from "@thirdweb-dev/auth/evm";
+import { authMiddleware, authRouter, getUser } from "./auth";
 
-const createContext = ({
+const createContext = async ({
   req,
   res,
 }: trpcExpress.CreateExpressContextOptions) => {
+  const user = await getUser(req);
+
   return {
     req,
     res,
+    user,
   };
 };
-type Context = inferAsyncReturnType<typeof createContext>;
+export type Context = inferAsyncReturnType<typeof createContext>;
 
 const t = initTRPC.context<Context>().create();
 const router = t.router;
@@ -24,54 +26,38 @@ const publicProcedure = t.procedure;
 
 const userCollection = db.collection("User");
 
+// TODO: Add middleware to check if user is in database
 const appRouter = router({
-  userCreate: publicProcedure
-    .input(z.object({ name: z.string() }))
+  userAddImageHash: publicProcedure
+    .input(
+      z.object({
+        imageHash: z.string(),
+      })
+    )
     .mutation(async (opts) => {
-      const { input } = opts;
+      const {
+        input,
+        ctx: { user },
+      } = opts;
 
-      const user = await userCollection.create([input.name, input.name]);
+      if (!user?.data) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action",
+        });
+      }
 
-      return user;
-    }),
-
-  auth: publicProcedure
-    .input(z.object({ name: z.string() }))
-    .mutation(async (opts) => {
-      const { input } = opts;
-
-      console.log(input);
-
-      return input;
+      return addImageHash(user.address, input.imageHash);
     }),
 });
 
 export type AppRouter = typeof appRouter;
-
-// TODO: type env vars
-const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY ?? "";
 
 async function main() {
   // express implementation
   const app = express();
 
   app.use(cors());
-
-  const { authRouter, authMiddleware } = ThirdwebAuth({
-    domain: process.env.THIRDWEB_AUTH_DOMAIN || "",
-    wallet: new PrivateKeyWallet(PRIVATE_KEY),
-    callbacks: {
-      onLogin: async (address) => {
-        const userResponse = await getUser(address);
-        const user = userResponse.data;
-
-        if (!user) {
-          const response = await createUser(address, []);
-          console.log("Created user", response);
-        }
-      },
-    },
-  });
 
   app.use((req, _res, next) => {
     // request logger
@@ -91,7 +77,23 @@ async function main() {
       createContext,
     })
   );
+
   app.get("/", (_req, res) => res.send("hello"));
+
+  app.get("/secret", async (req, res) => {
+    const user = await getUser(req);
+
+    if (!user) {
+      return res.status(401).json({
+        message: "Not authorized.",
+      });
+    }
+
+    return res.status(200).json({
+      message: "This is a secret... don't tell anyone.",
+    });
+  });
+
   app.listen(3333, () => {
     console.log("listening on port 3333");
   });

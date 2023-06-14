@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
-const WalletScreen = () => {
+const AuthScreen = () => {
   const isDarkMode = useColorScheme() === "dark";
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -51,4 +51,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WalletScreen;
+export default AuthScreen;

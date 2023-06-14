@@ -2,10 +2,10 @@
   "name": "@truesnap/mobile",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start --dev-client",
+    "start": "SERVER_URL=https://truesnap.loca.lt expo start --dev-client",
     "android": "expo run:android",
-    "ios": "expo run:ios",
-    "iphone": "expo run:ios --device"
+    "ios": "SERVER_URL=https://truesnap.loca.lt expo run:ios",
+    "iphone": "SERVER_URL=https://truesnap.loca.lt expo run:ios --device"
   },
   "dependencies": {
     "@expo/config-plugins": "~6.0.0",
@@ -13,9 +13,11 @@
     "@react-native-async-storage/async-storage": "1.17.11",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
+    "@tanstack/react-query": "^4.29.13",
     "@thirdweb-dev/react-native": "^0.2.17",
     "@thirdweb-dev/react-native-compat": "^0.2.17",
-    "@trpc/client": "^10.29.0",
+    "@trpc/client": "^10.30.0",
+    "@trpc/react-query": "^10.30.0",
     "@truesnap/api": "*",
     "big-integer": "^1.6.51",
     "cors": "^2.8.5",
@@ -34,6 +36,7 @@
     "react-native": "0.71.8",
     "react-native-crypto": "^2.2.0",
     "react-native-gesture-handler": "~2.9.0",
+    "react-native-get-random-values": "~1.8.0",
     "react-native-mmkv": "^2.8.0",
     "react-native-randombytes": "^3.6.1",
     "react-native-reanimated": "~2.14.4",
@@ -43,12 +46,14 @@
     "react-native-svg": "13.4.0",
     "react-native-vision-camera": "^2.15.4",
     "text-encoding": "^0.7.0",
-    "react-native-get-random-values": "~1.8.0"
+    "expo-secure-store": "~12.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/cors": "^2.8.13",
     "@types/react": "^18.2.8",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.4",
+    "dotenv-cli": "latest",
     "typescript": "^4.9.4"
   },
   "private": true

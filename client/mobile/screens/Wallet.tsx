@@ -17,6 +17,7 @@ import {
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { useLogin } from "@thirdweb-dev/react-native";
+import { setToken } from "../App";
 
 const WalletScreen = () => {
   const { isLoading, login } = useLogin();
@@ -34,7 +35,7 @@ const WalletScreen = () => {
   const handleSignMessage = async () => {
     try {
       const token = await login();
-      console.log("token:", token);
+      setToken(token);
     } catch (error) {
       console.log("login error:", error);
     }

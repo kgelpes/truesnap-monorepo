@@ -3,10 +3,9 @@ import Wallet from "ethereumjs-wallet";
 import { ethPersonalSign } from "@polybase/eth";
 import { db } from "./index";
 
-// PK, need to establish a PK so we can control updates
-
+// TODO: Check if user matches the address (auth)
 const schema = `
-@read
+@public
 collection users {
   id: string;
   imageHashes: string[];
@@ -14,6 +13,10 @@ collection users {
   constructor (id: string, imageHashes: string[]) {
     this.id = id;
     this.imageHashes = imageHashes || [];
+  }
+
+  addImageHash(imageHash: string) {
+    this.imageHashes.push(imageHash);
   }
 }
 `;
