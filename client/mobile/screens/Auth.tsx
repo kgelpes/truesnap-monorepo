@@ -1,10 +1,4 @@
-import {
-  ConnectWallet,
-  localWallet,
-  metamaskWallet,
-  rainbowWallet,
-  ThirdwebProvider,
-} from "@thirdweb-dev/react-native";
+import { ConnectWallet } from "@thirdweb-dev/react-native";
 import React from "react";
 import {
   SafeAreaView,

@@ -1,7 +1,8 @@
 import * as React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { DarkTheme, NavigationContainer } from "@react-navigation/native";
 import CameraScreen from "./screens/Camera";
 import SplashScreen from "./screens/SplashScreen";
+import GalleryScreen from "./screens/Gallery";
 import {
   NativeStackNavigationProp,
   createNativeStackNavigator,
@@ -16,6 +17,7 @@ export type RootStackParamList = {
   Auth: undefined;
   Camera: undefined;
   Wallet: undefined;
+  Gallery: undefined;
 };
 
 export type AuthScreenNavigationProp = NativeStackNavigationProp<
@@ -29,6 +31,10 @@ export type CameraScreenNavigationProp = NativeStackNavigationProp<
 export type WalletScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Wallet"
+>;
+export type GalleryScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "Gallery"
 >;
 
 export default function Router() {
@@ -48,7 +54,7 @@ export default function Router() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={DarkTheme}>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -60,6 +66,16 @@ export default function Router() {
           <>
             <Stack.Screen name="Camera" component={CameraScreen} />
             <Stack.Screen name="Wallet" component={WalletScreen} />
+            <Stack.Group
+              screenOptions={{
+                presentation: "modal",
+                headerShown: true,
+                headerTitle: "Your TrueSnaps",
+                headerShadowVisible: true,
+              }}
+            >
+              <Stack.Screen name="Gallery" component={GalleryScreen} />
+            </Stack.Group>
           </>
         )}
       </Stack.Navigator>

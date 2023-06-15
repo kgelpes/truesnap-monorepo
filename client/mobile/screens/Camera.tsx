@@ -334,7 +334,11 @@ export default function CameraScreen({
             </TouchableOpacity>
           ))}
         </Stack>
-        <TouchableOpacity onPress={() => console.log("gallery")}>
+        <TouchableOpacity
+          onPress={async () => {
+            navigation.navigate("Gallery");
+          }}
+        >
           <Ionicons name="images-outline" size={24} color="white" />
         </TouchableOpacity>
 
