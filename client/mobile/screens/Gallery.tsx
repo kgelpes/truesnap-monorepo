@@ -3,11 +3,16 @@ import { View, FlatList, Dimensions, Text } from "react-native";
 import * as FileSystem from "expo-file-system";
 import { Image } from "expo-image";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { GalleryScreenNavigationProp } from "../Router";
 
 const numColumns = 3;
 const size = Dimensions.get("window").width / numColumns;
 
-const Gallery = () => {
+const Gallery = ({
+  navigation,
+}: {
+  navigation: GalleryScreenNavigationProp['navigation']
+}) => {
   const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
@@ -77,6 +82,9 @@ const Gallery = () => {
     }
     return (
       <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("PhotoModal", { uri: item });
+        }}
         style={[
           {
             flex: 1,

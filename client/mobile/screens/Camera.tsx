@@ -43,7 +43,7 @@ Reanimated.addWhitelistedNativeProps({
 export default function CameraScreen({
   navigation,
 }: {
-  navigation: CameraScreenNavigationProp;
+  navigation: CameraScreenNavigationProp["navigation"];
 }) {
   const userAddImageHash = trpc.userAddImageHash.useMutation();
 

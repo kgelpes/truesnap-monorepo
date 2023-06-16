@@ -4,12 +4,13 @@ import CameraScreen from "./screens/Camera";
 import SplashScreen from "./screens/SplashScreen";
 import GalleryScreen from "./screens/Gallery";
 import {
-  NativeStackNavigationProp,
+  NativeStackScreenProps,
   createNativeStackNavigator,
 } from "@react-navigation/native-stack";
 import WalletScreen from "./screens/Wallet";
 import AuthScreen from "./screens/Auth";
 import { useAddress } from "@thirdweb-dev/react-native";
+import PhotoModal from "./screens/PhotoModal";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,23 +19,28 @@ export type RootStackParamList = {
   Camera: undefined;
   Wallet: undefined;
   Gallery: undefined;
+  PhotoModal: { uri: string };
 };
 
-export type AuthScreenNavigationProp = NativeStackNavigationProp<
+export type AuthScreenNavigationProp = NativeStackScreenProps<
   RootStackParamList,
   "Auth"
 >;
-export type CameraScreenNavigationProp = NativeStackNavigationProp<
+export type CameraScreenNavigationProp = NativeStackScreenProps<
   RootStackParamList,
   "Camera"
 >;
-export type WalletScreenNavigationProp = NativeStackNavigationProp<
+export type WalletScreenNavigationProp = NativeStackScreenProps<
   RootStackParamList,
   "Wallet"
 >;
-export type GalleryScreenNavigationProp = NativeStackNavigationProp<
+export type GalleryScreenNavigationProp = NativeStackScreenProps<
   RootStackParamList,
   "Gallery"
+>;
+export type PhotoModalScreenNavigationProp = NativeStackScreenProps<
+  RootStackParamList,
+  "PhotoModal"
 >;
 
 export default function Router() {
@@ -75,6 +81,13 @@ export default function Router() {
               }}
             >
               <Stack.Screen name="Gallery" component={GalleryScreen} />
+              <Stack.Screen
+                name="PhotoModal"
+                component={PhotoModal}
+                options={{
+                  headerShown: false,
+                }}
+              />
             </Stack.Group>
           </>
         )}
