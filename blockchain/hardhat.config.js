@@ -10,13 +10,13 @@ module.exports = {
     solidity: {
         version: "0.8.17",
         settings: {
-          optimizer: {
-            enabled: true,
-            runs: 1000,
-            details: { yul: false },
-          },
+            optimizer: {
+                enabled: true,
+                runs: 1000,
+                details: { yul: false },
+            },
         },
-      },
+    },
     defaultNetwork: "calibrationnet",
     networks: {
         localnet: {
@@ -32,6 +32,11 @@ module.exports = {
         filecoinmainnet: {
             chainId: 314,
             url: "https://api.node.glif.io",
+            accounts: [PRIVATE_KEY],
+        },
+        mumbai: {
+            chainId: 80001,
+            url: "https://rpc-mumbai.maticvigil.com",
             accounts: [PRIVATE_KEY],
         },
     },
