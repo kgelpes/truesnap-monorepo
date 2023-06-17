@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { addImageHash, db, getDBUser } from "@truesnap/db";
+import {
+  addImageHash,
+  db,
+  getDBUser,
+  createVerifiedImageMetadata,
+} from "@truesnap/db";
 import { TRPCError, inferAsyncReturnType, initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import express from "express";
@@ -9,7 +14,7 @@ import { createHash } from "node:crypto";
 import * as fs from "node:fs";
 
 import { authMiddleware, authRouter, getUser } from "./auth";
-import { NFTStorage, File, Blob } from "nft.storage";
+import { NFTStorage, File } from "nft.storage";
 
 const upload = multer({ dest: "uploads/" });
 
@@ -106,6 +111,18 @@ async function main() {
       });
     }
 
+    const deleteImage = () => {
+      if (req.file) {
+        fs.unlink(req.file.path, (err) => {
+          if (err) {
+            console.error(`Failed to delete file: ${err}`);
+          } else {
+            console.log(`Deleted file`);
+          }
+        });
+      }
+    };
+
     // Hashes blob to check if it exists in database
     const hash = createHash("sha256");
     const fileStream = fs.createReadStream(req.file.path);
@@ -125,11 +142,25 @@ async function main() {
           new File([data], req.file.originalname)
         );
 
-        console.log("nfstorage success!", cid);
         // Add CID to polybase
+        const record = await createVerifiedImageMetadata(
+          `${user.address}-${req.file.originalname}`,
+          req.file.originalname,
+          cid,
+          fileHash,
+          user.address
+        );
+
+        // deleteImage();
+
+        return res.status(200).json({
+          message: "Image uploaded and verified.",
+          recordId: record.data.id,
+        });
       } else {
         // Error if does not exist (means photo is not verified)
         console.log("does not exist!");
+        deleteImage();
       }
     });
 
@@ -142,11 +173,9 @@ async function main() {
     //   }
     // });
 
-    // Send success response with polybase URI
-
-    return res.status(200).json({
-      message: "This is a secret... don't tell anyone.",
-    });
+    // return res.status(500).json({
+    //   message: "Something went wrong.",
+    // });
   });
 
   app.listen(3333, () => {

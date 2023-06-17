@@ -4,6 +4,7 @@ import { ethPersonalSign } from "@polybase/eth";
 import { db } from "./index";
 
 // TODO: Check if user matches the address (auth)
+// TODO: Verified image metadata should be read only. Only should be created by admin.
 const schema = `
 @public
 collection users {
@@ -19,6 +20,23 @@ collection users {
     this.imageHashes.push(imageHash);
   }
 }
+
+@public
+collection verifiedImageMetadata {
+  id: string;
+  name: string;
+  image: string;
+  imageHash: string;
+  creator: users;
+
+  constructor (id: string, name: string, image: string, imageHash: string, creator: users) {
+    this.id = id;
+    this.name = name;
+    this.image = image;
+    this.imageHash = imageHash;
+    this.creator = creator;
+  }
+} 
 `;
 
 const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY ?? "";
