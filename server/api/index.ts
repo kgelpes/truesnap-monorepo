@@ -1,10 +1,20 @@
 import { z } from "zod";
-import { addImageHash, db } from "@truesnap/db";
+import { addImageHash, db, getDBUser } from "@truesnap/db";
 import { TRPCError, inferAsyncReturnType, initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import express from "express";
 import cors from "cors";
+import multer from "multer";
+import { createHash } from "node:crypto";
+import * as fs from "node:fs";
+
 import { authMiddleware, authRouter, getUser } from "./auth";
+import { NFTStorage, File, Blob } from "nft.storage";
+
+const upload = multer({ dest: "uploads/" });
+
+const NFT_STORAGE_TOKEN = process.env.NFT_STORAGE_KEY ?? "";
+const nftStorage = new NFTStorage({ token: NFT_STORAGE_TOKEN });
 
 const createContext = async ({
   req,
@@ -80,7 +90,7 @@ async function main() {
 
   app.get("/", (_req, res) => res.send("hello"));
 
-  app.get("/secret", async (req, res) => {
+  app.patch("/uploadPhoto", upload.single("file"), async (req, res) => {
     const user = await getUser(req);
 
     if (!user) {
@@ -88,6 +98,51 @@ async function main() {
         message: "Not authorized.",
       });
     }
+
+    // Receives blob
+    if (!req.file) {
+      return res.status(400).json({
+        message: "No file received.",
+      });
+    }
+
+    // Hashes blob to check if it exists in database
+    const hash = createHash("sha256");
+    const fileStream = fs.createReadStream(req.file.path);
+    fileStream.on("data", (data) => hash.update(data));
+    fileStream.on("end", async () => {
+      const fileHash = hash.digest("hex");
+
+      // Check if it exists in database
+      const userData = await getDBUser(user.address);
+      const imageHashes = userData?.data?.imageHashes ?? [];
+
+      if (imageHashes.includes(fileHash) && req.file) {
+        console.log("exists!");
+        // Upload blob with nft.storage
+        const data = await fs.promises.readFile(req.file.path);
+        const cid = await nftStorage.storeBlob(
+          new File([data], req.file.originalname)
+        );
+
+        console.log("nfstorage success!", cid);
+        // Add CID to polybase
+      } else {
+        // Error if does not exist (means photo is not verified)
+        console.log("does not exist!");
+      }
+    });
+
+    // Delete file from server
+    // fs.unlink(req.file.path, (err) => {
+    //   if (err) {
+    //     console.error(`Failed to delete file: ${err}`);
+    //   } else {
+    //     console.log(`Deleted file`);
+    //   }
+    // });
+
+    // Send success response with polybase URI
 
     return res.status(200).json({
       message: "This is a secret... don't tell anyone.",

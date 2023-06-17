@@ -3,12 +3,39 @@ import { PhotoModalScreenNavigationProp } from "../Router";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useMutation } from "@tanstack/react-query";
+import * as FileSystem from "expo-file-system";
+
+const serverUrl = process.env.SERVER_URL || "";
 
 function PhotoModal({
   route,
 }: {
   route?: PhotoModalScreenNavigationProp["route"];
 }) {
+  const mutateUploadPhoto = useMutation({
+    mutationFn: async (uri: string) => {
+      console.log("uri", uri);
+      try {
+        const response = await FileSystem.uploadAsync(
+          `${serverUrl}/uploadPhoto`,
+          uri,
+          {
+            fieldName: "file",
+            httpMethod: "PATCH",
+            uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+            // headers: {
+            //   Authorization: `Bearer ${token}`,
+            // },
+          }
+        );
+        console.log(JSON.stringify(response, null, 4));
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  });
+
   return (
     <SafeAreaView
       style={{
@@ -29,6 +56,9 @@ function PhotoModal({
         contentFit="cover"
       />
       <TouchableOpacity
+        onPress={() => {
+          mutateUploadPhoto.mutate(route?.params.uri || "");
+        }}
         style={{
           position: "absolute",
           bottom: 36,

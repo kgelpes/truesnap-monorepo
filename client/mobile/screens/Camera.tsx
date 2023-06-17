@@ -32,8 +32,10 @@ import Reanimated, {
 import { MAX_ZOOM_FACTOR } from "../Constants";
 import Stack from "../components/Stack";
 import * as FileSystem from "expo-file-system";
+
 import { CameraScreenNavigationProp } from "../Router";
 import { trpc } from "../trpc";
+import { sha256 } from "ethers/lib/utils";
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 Reanimated.addWhitelistedNativeProps({
@@ -159,12 +161,14 @@ export default function CameraScreen({
         to: photoPath,
       });
 
-      const photoAsString = await FileSystem.readAsStringAsync(photoPath, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
+      const photoFile = await fetch(photoPath);
+      const photoAsBlob = await photoFile.blob();
+      const arrayBuffer = await new Response(photoAsBlob).arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      const imageHash = sha256(uint8Array).substring(2);
 
       userAddImageHash.mutate({
-        imageHash: photoAsString,
+        imageHash,
       });
     } else {
       console.log("camera not initialized");

@@ -13,7 +13,7 @@ import Router from "./Router";
 
 const serverUrl = process.env.SERVER_URL || "";
 
-let token: string;
+export let token: string;
 export function setToken(newToken: string) {
   token = newToken;
 }
