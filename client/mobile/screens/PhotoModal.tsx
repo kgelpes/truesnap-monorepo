@@ -5,6 +5,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useMutation } from "@tanstack/react-query";
 import * as FileSystem from "expo-file-system";
+import {
+  SignedPayload721WithQuantitySignature,
+  useContract,
+} from "@thirdweb-dev/react-native";
 
 const serverUrl = process.env.SERVER_URL || "";
 
@@ -13,6 +17,12 @@ function PhotoModal({
 }: {
   route?: PhotoModalScreenNavigationProp["route"];
 }) {
+  // Put address on env var
+  const { contract: nftCollection } = useContract(
+    "0xC3f1959443F0470246aA53B7622bddf9D3e4Bb3d",
+    "nft-collection"
+  );
+
   const mutateUploadPhoto = useMutation({
     mutationFn: async (uri: string) => {
       console.log("uri", uri);
@@ -29,7 +39,17 @@ function PhotoModal({
             // },
           }
         );
-        console.log(JSON.stringify(response, null, 4));
+
+        const jsonRes = JSON.parse(response.body);
+        const nft = await nftCollection?.signature.mint(
+          jsonRes.signedPayload as SignedPayload721WithQuantitySignature
+        );
+
+        console.log('nft', nft)
+
+        alert("Minted succesfully!");
+
+        return nft;
       } catch (error) {
         console.log(error);
       }

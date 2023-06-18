@@ -32,10 +32,10 @@ import Reanimated, {
 import { MAX_ZOOM_FACTOR } from "../Constants";
 import Stack from "../components/Stack";
 import * as FileSystem from "expo-file-system";
+import crypto from 'react-native-crypto'
 
 import { CameraScreenNavigationProp } from "../Router";
 import { trpc } from "../trpc";
-import { sha256 } from "ethers/lib/utils";
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 Reanimated.addWhitelistedNativeProps({
@@ -149,7 +149,7 @@ export default function CameraScreen({
     setIsCameraInitialized(true);
   }, []);
 
-  const onPhotoCaptured = useCallback(async () => {
+  const onPhotoCaptured = async () => {
     if (camera.current) {
       const timestamp = new Date().getTime();
 
@@ -161,11 +161,14 @@ export default function CameraScreen({
         to: photoPath,
       });
 
-      const photoFile = await fetch(photoPath);
-      const photoAsBlob = await photoFile.blob();
-      const arrayBuffer = await new Response(photoAsBlob).arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
-      const imageHash = sha256(uint8Array).substring(2);
+      const photoAsString = await FileSystem.readAsStringAsync(photoPath, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const hash = crypto.createHash("sha256");
+      hash.update(photoAsString);
+
+      const imageHash = hash.digest("hex");
 
       userAddImageHash.mutate({
         imageHash,
@@ -173,7 +176,7 @@ export default function CameraScreen({
     } else {
       console.log("camera not initialized");
     }
-  }, []);
+  };
 
   const onFlipCameraPressed = useCallback(() => {
     setCameraPosition((p) => (p === "back" ? "front" : "back"));
@@ -271,6 +274,7 @@ export default function CameraScreen({
                 borderRadius: 12,
               }}
               device={device}
+              preset="photo"
               enableHighQualityPhotos
               isActive={isActive}
               onInitialized={onInitialized}
