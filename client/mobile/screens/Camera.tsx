@@ -59,6 +59,7 @@ export default function CameraScreen({
       if (error.data?.code === "UNAUTHORIZED") {
         await logout();
       }
+      console.log("error adding hash", error);
     },
   });
 

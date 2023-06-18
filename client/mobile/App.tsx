@@ -23,7 +23,7 @@ const App = () => {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: `${serverUrl}/trpc`,
+          url: `https://${serverUrl}/trpc`,
           headers: async () => {
             console.log("getting header");
             const token = await thirdwebStorage?.getItem(

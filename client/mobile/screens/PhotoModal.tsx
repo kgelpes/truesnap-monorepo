@@ -24,7 +24,7 @@ function PhotoModal({
 }: {
   route?: PhotoModalScreenNavigationProp["route"];
 }) {
-  const [modalVisible, setModalVisible] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const { contract: nftCollection } = useContract(
     "0xC3f1959443F0470246aA53B7622bddf9D3e4Bb3d",
@@ -76,7 +76,7 @@ function PhotoModal({
             width: "100%",
             // height: "100%",
             aspectRatio: 3 / 4,
-            backgroundColor: "blue",
+            backgroundColor: "black",
           }}
         >
           <Image
@@ -229,29 +229,6 @@ function PhotoModal({
                   You will be asked to sign a transaction to mint your NFT.
                 </Text>
               </View>
-
-              <TouchableOpacity
-                onPress={() => {
-                  setModalVisible(false);
-                }}
-                style={{
-                  padding: 20,
-                  alignItems: "center",
-                  borderRadius: 16,
-                  backgroundColor: "white",
-                  marginTop: 20,
-                }}
-              >
-                <Text
-                  style={{
-                    color: "black",
-                    fontSize: 20,
-                    fontWeight: "bold",
-                  }}
-                >
-                  Close
-                </Text>
-              </TouchableOpacity>
             </View>
           )}
 
