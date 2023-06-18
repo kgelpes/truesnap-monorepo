@@ -19,7 +19,7 @@ import { NFTStorage, File } from "nft.storage";
 
 const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY ?? "";
 const NFT_COLLECTION_ADDRESS = process.env.NFT_COLLECTION_ADDRESS ?? "";
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "temp_uploads/" });
 
 const NFT_STORAGE_TOKEN = process.env.NFT_STORAGE_KEY ?? "";
 const nftStorage = new NFTStorage({ token: NFT_STORAGE_TOKEN });
@@ -128,96 +128,103 @@ async function main() {
   app.get("/", (_req, res) => res.send("hello"));
 
   app.patch("/uploadPhoto", upload.single("file"), async (req, res) => {
-    const user = await getUser(req);
+    try {
+      const user = await getUser(req);
 
-    if (!user) {
-      return res.status(401).json({
-        message: "Not authorized.",
-      });
-    }
-
-    // Receives blob
-    if (!req.file) {
-      return res.status(400).json({
-        message: "No file received.",
-      });
-    }
-
-    const deleteImage = () => {
-      if (req.file) {
-        fs.unlink(req.file.path, (err) => {
-          if (err) {
-            console.error(`Failed to delete file: ${err}`);
-          } else {
-            console.log(`Deleted file`);
-          }
+      if (!user) {
+        return res.status(401).json({
+          message: "Not authorized.",
         });
       }
-    };
 
-    // Hashes blob to check if it exists in database
-    const hash = createHash("sha256");
+      // Receives blob
+      if (!req.file) {
+        return res.status(400).json({
+          message: "No file received.",
+        });
+      }
 
-    const base64String = convertFileToBase64(req.file.path);
+      const deleteImage = () => {
+        if (req.file) {
+          fs.unlink(req.file.path, (err) => {
+            if (err) {
+              console.error(`Failed to delete file: ${err}`);
+            } else {
+              console.log(`Deleted file`);
+            }
+          });
+        }
+      };
 
-    if (!base64String) {
-      deleteImage();
+      // Hashes blob to check if it exists in database
+      const hash = createHash("sha256");
+
+      const base64String = convertFileToBase64(req.file.path);
+
+      if (!base64String) {
+        deleteImage();
+        return res.status(500).json({
+          message: "Failed to convert file to base64.",
+        });
+      }
+
+      hash.update(base64String);
+      const fileHash = hash.digest("hex");
+
+      console.log("fileHash", fileHash);
+
+      // Check if it exists in database
+      const userData = await getDBUser(user.address);
+      const imageHashes = userData?.data?.imageHashes ?? [];
+
+      console.log("imageHashes", imageHashes);
+      console.log("includes", imageHashes.includes(fileHash));
+
+      if (imageHashes.includes(fileHash) && req.file) {
+        console.log("exists!");
+        // Upload blob with nft.storage
+        const data = await fs.promises.readFile(req.file.path);
+        const cid = await nftStorage.storeBlob(
+          new File([data], req.file.originalname)
+        );
+
+        // Add CID to polybase
+        const record = await createVerifiedImageMetadata(
+          `${user.address}-${req.file.originalname}`,
+          req.file.originalname,
+          cid,
+          fileHash,
+          user.address
+        );
+
+        const sdk = ThirdwebSDK.fromPrivateKey(PRIVATE_KEY, "mumbai");
+
+        const nftCollection = await sdk.getContract(
+          NFT_COLLECTION_ADDRESS,
+          "nft-collection"
+        );
+
+        const signedPayload = await nftCollection.signature.generate({
+          to: user.address,
+          metadata: `https://testnet.polybase.xyz/v0/collections/truesnap%2Fdev%2FverifiedImageMetadata/records/${record.data.id}?format=nft`,
+        });
+
+        deleteImage();
+
+        return res.status(200).json({
+          message: "Image uploaded and verified.",
+          signedPayload: JSON.parse(JSON.stringify(signedPayload)),
+        });
+      } else {
+        // Error if does not exist (means photo is not verified)
+        console.log("does not exist!");
+        deleteImage();
+      }
+    } catch (error) {
+      console.error(`Error uploading photo: ${error}`);
       return res.status(500).json({
-        message: "Failed to convert file to base64.",
+        message: "Error uploading photo.",
       });
-    }
-
-    hash.update(base64String);
-    const fileHash = hash.digest("hex");
-
-    console.log("fileHash", fileHash);
-
-    // Check if it exists in database
-    const userData = await getDBUser(user.address);
-    const imageHashes = userData?.data?.imageHashes ?? [];
-
-    console.log("imageHashes", imageHashes);
-    console.log("includes", imageHashes.includes(fileHash));
-
-    if (imageHashes.includes(fileHash) && req.file) {
-      console.log("exists!");
-      // Upload blob with nft.storage
-      const data = await fs.promises.readFile(req.file.path);
-      const cid = await nftStorage.storeBlob(
-        new File([data], req.file.originalname)
-      );
-
-      // Add CID to polybase
-      const record = await createVerifiedImageMetadata(
-        `${user.address}-${req.file.originalname}`,
-        req.file.originalname,
-        cid,
-        fileHash,
-        user.address
-      );
-
-      const sdk = ThirdwebSDK.fromPrivateKey(PRIVATE_KEY, "mumbai");
-
-      const nftCollection = await sdk.getContract(
-        NFT_COLLECTION_ADDRESS,
-        "nft-collection"
-      );
-
-      const signedPayload = await nftCollection.signature.generate({
-        to: user.address,
-        metadata: `https://testnet.polybase.xyz/v0/collections/truesnap%2Fdev%2FverifiedImageMetadata/records/${record.data.id}?format=nft`,
-      });
-
-      deleteImage();
-
-      return res.status(200).json({
-        message: "Image uploaded and verified.",
-        signedPayload: JSON.parse(JSON.stringify(signedPayload)),
-      });
-    } else {
-      // Error if does not exist (means photo is not verified)
-      console.log("does not exist!");
-      deleteImage();
     }
   });
 

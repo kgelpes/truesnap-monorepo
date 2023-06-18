@@ -2,10 +2,10 @@
   "name": "@truesnap/mobile",
   "version": "1.0.0",
   "scripts": {
-    "start": "SERVER_URL=https://truesnap.loca.lt expo start --dev-client",
+    "start": "SERVER_URL=api.dev.truesnap.app expo start --dev-client",
     "android": "expo run:android",
-    "ios": "SERVER_URL=https://truesnap.loca.lt expo run:ios",
-    "iphone": "SERVER_URL=https://truesnap.loca.lt expo run:ios --device"
+    "ios": "SERVER_URL=api.dev.truesnap.app expo run:ios",
+    "iphone": "SERVER_URL=api.dev.truesnap.app expo run:ios --device"
   },
   "dependencies": {
     "@expo/config-plugins": "~6.0.0",

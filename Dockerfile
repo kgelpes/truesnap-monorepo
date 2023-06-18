@@ -45,6 +45,9 @@ RUN yarn global add tsx
 # Don't run production as root
 RUN addgroup --system --gid 1001 expressjs
 RUN adduser --system --uid 1001 expressjs
+
+RUN mkdir -p /app/temp_uploads && chown expressjs:expressjs /app/temp_uploads
+
 USER expressjs
 COPY --from=installer /app .
 
