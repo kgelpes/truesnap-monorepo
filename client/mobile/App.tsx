@@ -8,6 +8,7 @@ import {
 import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
+import { Mumbai } from "@thirdweb-dev/chains";
 
 import { trpc } from "./trpc";
 import Router from "./Router";
@@ -28,7 +29,6 @@ const App = () => {
             const token = await thirdwebStorage?.getItem(
               "auth_token_storage_key"
             );
-            console.log("headers token", token);
 
             return {
               Authorization: `Bearer ${token}`,
@@ -43,10 +43,11 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <ThirdwebProvider
           activeChain="mumbai"
-          supportedWallets={[metamaskWallet(), rainbowWallet(), localWallet()]}
+          supportedChains={[Mumbai]}
+          supportedWallets={[metamaskWallet()]}
           authConfig={{
-            domain: serverUrl,
-            authUrl: `${serverUrl}/auth`,
+            domain: `https://${serverUrl}`,
+            authUrl: `https://${serverUrl}/auth`,
             secureStorage: thirdwebStorage,
           }}
           queryClient={queryClient}

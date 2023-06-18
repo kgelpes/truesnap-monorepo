@@ -40,6 +40,7 @@ import {
   useThirdwebAuthContext,
   useUser,
 } from "@thirdweb-dev/react-native";
+import { useIsFocused } from "@react-navigation/native";
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 Reanimated.addWhitelistedNativeProps({
@@ -66,9 +67,9 @@ export default function CameraScreen({
   const zoom = useSharedValue(1);
   const isPressingButton = useSharedValue(false);
   const [selectedZoomOption, setSelectedZoomOption] = useState(zoom.value);
+  const isActive = useIsFocused();
 
-  // TODO: check if camera page is active
-  const isActive = true;
+  const [processingPhotos, setProcessingPhotos] = useState(0);
 
   const [cameraPosition, setCameraPosition] = useState<"front" | "back">(
     "back"
@@ -162,6 +163,7 @@ export default function CameraScreen({
   }, []);
 
   const onPhotoCaptured = async () => {
+    setProcessingPhotos((p) => p + 1);
     if (camera.current) {
       const timestamp = new Date().getTime();
 
@@ -182,12 +184,13 @@ export default function CameraScreen({
 
       const imageHash = hash.digest("hex");
 
-      userAddImageHash.mutate({
+      await userAddImageHash.mutateAsync({
         imageHash,
       });
     } else {
       console.log("camera not initialized");
     }
+    setProcessingPhotos((p) => p - 1);
   };
 
   const onFlipCameraPressed = useCallback(() => {
@@ -359,7 +362,24 @@ export default function CameraScreen({
             navigation.navigate("Gallery");
           }}
         >
-          <Ionicons name="images-outline" size={24} color="white" />
+          <Ionicons
+            name="images-outline"
+            size={24}
+            color={processingPhotos > 0 ? "rgba(255,255,255,0.5)" : "white"}
+          />
+          {processingPhotos > 0 && (
+            <ActivityIndicator
+              style={{
+                position: "absolute",
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+                width: 24,
+                height: 24,
+              }}
+            />
+          )}
         </TouchableOpacity>
 
         <CircleButton onPress={onPhotoCaptured} />
