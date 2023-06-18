@@ -1,4 +1,5 @@
 import {
+  createSecureStorage,
   localWallet,
   metamaskWallet,
   rainbowWallet,
@@ -13,26 +14,30 @@ import Router from "./Router";
 
 const serverUrl = process.env.SERVER_URL || "";
 
-export let token: string;
-export function setToken(newToken: string) {
-  token = newToken;
-}
-
-const queryClient = new QueryClient();
-const trpcClient = trpc.createClient({
-  links: [
-    httpBatchLink({
-      url: `${serverUrl}/trpc`,
-      headers() {
-        return {
-          Authorization: `Bearer ${token}`,
-        };
-      },
-    }),
-  ],
-});
+const thirdwebStorage = createSecureStorage("thirdweb");
 
 const App = () => {
+  const [queryClient] = useState(new QueryClient());
+  const [trpcClient] = useState(
+    trpc.createClient({
+      links: [
+        httpBatchLink({
+          url: `${serverUrl}/trpc`,
+          headers: async () => {
+            console.log("getting header");
+            const token = await thirdwebStorage?.getItem(
+              "auth_token_storage_key"
+            );
+            console.log("headers token", token);
+
+            return {
+              Authorization: `Bearer ${token}`,
+            };
+          },
+        }),
+      ],
+    })
+  );
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
@@ -42,6 +47,7 @@ const App = () => {
           authConfig={{
             domain: serverUrl,
             authUrl: `${serverUrl}/auth`,
+            secureStorage: thirdwebStorage,
           }}
           queryClient={queryClient}
         >

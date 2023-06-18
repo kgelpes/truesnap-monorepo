@@ -1,73 +1,58 @@
-import {
-  ConnectWallet,
-  localWallet,
-  metamaskWallet,
-  rainbowWallet,
-  ThirdwebProvider,
-  useSDK,
-} from "@thirdweb-dev/react-native";
+import { ConnectWallet } from "@thirdweb-dev/react-native";
 import React from "react";
-import {
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { SafeAreaView, Text, View } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
-import { useLogin } from "@thirdweb-dev/react-native";
-import { setToken } from "../App";
 
 const WalletScreen = () => {
-  const { isLoading, login } = useLogin();
-
-  const isDarkMode = useColorScheme() === "dark";
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  const textStyles = {
-    color: isDarkMode ? Colors.white : Colors.black,
-    ...styles.heading,
-  };
-
-  const handleSignMessage = async () => {
-    try {
-      const token = await login();
-      setToken(token);
-    } catch (error) {
-      console.log("login error:", error);
-    }
-  };
-
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <View style={styles.view}>
-        <Text style={textStyles}>React Native thirdweb starter</Text>
-        <ConnectWallet />
+    <SafeAreaView
+      style={{
+        height: "100%",
+        width: "100%",
+        backgroundColor: Colors.black,
+      }}
+    >
+      <View
+        style={{
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          marginHorizontal: 32,
+        }}
+      >
+        <View
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 32,
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: "bold",
+              marginBottom: 48,
+            }}
+          >
+            Your Profile
+          </Text>
+        </View>
 
-        <TouchableOpacity onPress={handleSignMessage}>
-          <Text>{isLoading ? "Loading..." : "Sign in with Ethereum"}</Text>
-        </TouchableOpacity>
+        <View
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: 32,
+          }}
+        >
+          <ConnectWallet />
+        </View>
       </View>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  view: {
-    height: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    alignContent: "center",
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-});
 
 export default WalletScreen;

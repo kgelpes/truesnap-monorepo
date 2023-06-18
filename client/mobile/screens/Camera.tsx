@@ -20,7 +20,6 @@ import {
   Camera,
   CameraPermissionStatus,
   CameraRuntimeError,
-  PhotoFile,
   useCameraDevices,
 } from "react-native-vision-camera";
 import { TapGestureHandler } from "react-native-gesture-handler";
@@ -32,10 +31,15 @@ import Reanimated, {
 import { MAX_ZOOM_FACTOR } from "../Constants";
 import Stack from "../components/Stack";
 import * as FileSystem from "expo-file-system";
-import crypto from 'react-native-crypto'
+import crypto from "react-native-crypto";
 
 import { CameraScreenNavigationProp } from "../Router";
 import { trpc } from "../trpc";
+import {
+  useLogout,
+  useThirdwebAuthContext,
+  useUser,
+} from "@thirdweb-dev/react-native";
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 Reanimated.addWhitelistedNativeProps({
@@ -47,7 +51,15 @@ export default function CameraScreen({
 }: {
   navigation: CameraScreenNavigationProp["navigation"];
 }) {
-  const userAddImageHash = trpc.userAddImageHash.useMutation();
+  const { logout } = useLogout();
+
+  const userAddImageHash = trpc.userAddImageHash.useMutation({
+    onError: async (error) => {
+      if (error.data?.code === "UNAUTHORIZED") {
+        await logout();
+      }
+    },
+  });
 
   const camera = useRef<Camera>(null);
   const [isCameraInitialized, setIsCameraInitialized] = useState(false);

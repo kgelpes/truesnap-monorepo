@@ -9,19 +9,25 @@ const { authRouter, authMiddleware, getUser } = ThirdwebAuth({
   wallet: new PrivateKeyWallet(PRIVATE_KEY),
   callbacks: {
     onLogin: async (address) => {
-      const userResponse = await getDBUser(address);
-      const user = userResponse.data;
-
-      if (!user) {
-        const response = await createUser(address, []);
-        console.log("Created user", response);
+      try {
+        const userResponse = await getDBUser(address);
+        const user = userResponse?.data;
+        if (!user) {
+          const response = await createUser(address, []);
+          console.log("Created user", response);
+        }
+      } catch (error) {
+        console.log("Error getting user", error);
       }
     },
     onUser: async (user) => {
-      console.log("onUser", user);
-      const userResponse = await getDBUser(user.address);
+      try {
+        const userResponse = await getDBUser(user.address);
 
-      return userResponse.data;
+        return userResponse.data;
+      } catch (error) {
+        console.log("Error getting user", error);
+      }
     },
   },
 });

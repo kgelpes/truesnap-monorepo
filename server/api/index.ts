@@ -80,7 +80,21 @@ const appRouter = router({
         });
       }
 
-      return addImageHash(user.address, input.imageHash);
+      console.log("adding hash", input.imageHash);
+
+      try {
+        const response = await addImageHash(user.address, input.imageHash);
+
+        console.log("response", response);
+
+        return response;
+      } catch (error) {
+        console.log(`Error adding image hash: ${error}`);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error adding image hash",
+        });
+      }
     }),
 });
 
@@ -156,9 +170,14 @@ async function main() {
     hash.update(base64String);
     const fileHash = hash.digest("hex");
 
+    console.log("fileHash", fileHash);
+
     // Check if it exists in database
     const userData = await getDBUser(user.address);
     const imageHashes = userData?.data?.imageHashes ?? [];
+
+    console.log("imageHashes", imageHashes);
+    console.log("includes", imageHashes.includes(fileHash));
 
     if (imageHashes.includes(fileHash) && req.file) {
       console.log("exists!");

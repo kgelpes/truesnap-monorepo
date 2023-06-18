@@ -12,6 +12,7 @@
     "@trpc/server": "^10.30.0",
     "@truesnap/db": "*",
     "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "ethers": "^5.7.2",
     "express": "^4.18.2",
     "zod": "^3.21.4"

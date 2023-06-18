@@ -1,12 +1,24 @@
-import { View, ActivityIndicator, Text } from "react-native";
+import React from "react";
+import {
+  ActivityIndicator,
+  ImageBackground,
+} from "react-native";
 
-function SplashScreen() {
+const SplashScreen = () => {
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text>Getting token...</Text>
-      <ActivityIndicator size="large" />
-    </View>
+    <ImageBackground
+      source={require("../assets/bg.jpg")}
+      style={{
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <ActivityIndicator size="large" color="#fff" />
+    </ImageBackground>
   );
-}
+};
 
 export default SplashScreen;

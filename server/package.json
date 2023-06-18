@@ -6,7 +6,7 @@
     "build": "tsc",
     "dev": "dotenv -e ../.env tsx watch api",
     "load": "dotenv -e ../.env tsx db/schema",
-    "start": "node dist/api",
+    "start": "tsx api/index.ts",
     "lint": "eslint --ext \".js,.ts,.tsx\" --report-unused-disable-directives */*.ts",
     "localtunnel": "lt --port 3333 --subdomain truesnap"
   },

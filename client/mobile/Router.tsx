@@ -9,7 +9,11 @@ import {
 } from "@react-navigation/native-stack";
 import WalletScreen from "./screens/Wallet";
 import AuthScreen from "./screens/Auth";
-import { useAddress } from "@thirdweb-dev/react-native";
+import {
+  useAddress,
+  useThirdwebAuthContext,
+  useUser,
+} from "@thirdweb-dev/react-native";
 import PhotoModal from "./screens/PhotoModal";
 
 const Stack = createNativeStackNavigator();
@@ -44,18 +48,23 @@ export type PhotoModalScreenNavigationProp = NativeStackScreenProps<
 >;
 
 export default function Router() {
-  const [isReady, setIsReady] = React.useState(false);
   const userAddress = useAddress();
+  const { isLoading, isLoggedIn } = useUser();
+  // const auth = React.useContext(AuthContext);
+  // const thirdWebAuth = useThirdwebAuthContext();
 
-  React.useEffect(() => {
-    // Wait for SDK to be ready
-    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    sleep(100).then(() => {
-      setIsReady(true);
-    });
-  }, []);
+  // console.log('auth', auth)
+  // console.log('thirdWebAuth', thirdWebAuth?.secureStorage?.getItem('auth_token_storage_key').then(res => console.log('thirdwebtoken', res)))
 
-  if (!isReady) {
+  // React.useEffect(() => {
+  //   // Wait for SDK to be ready
+  //   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  //   sleep(100).then(() => {
+  //     setIsReady(true);
+  //   });
+  // }, []);
+
+  if (isLoading) {
     return <SplashScreen />;
   }
 
@@ -66,12 +75,23 @@ export default function Router() {
           headerShown: false,
         }}
       >
-        {!userAddress ? (
+        {!userAddress || !isLoggedIn ? (
           <Stack.Screen name="Auth" component={AuthScreen} />
         ) : (
           <>
             <Stack.Screen name="Camera" component={CameraScreen} />
-            <Stack.Screen name="Wallet" component={WalletScreen} />
+
+            <Stack.Group
+              screenOptions={{
+                headerShown: true,
+                headerTitle: "TrueSnap",
+                headerShadowVisible: true,
+                headerBackVisible: true,
+              }}
+            >
+              <Stack.Screen name="Wallet" component={WalletScreen} />
+            </Stack.Group>
+
             <Stack.Group
               screenOptions={{
                 presentation: "modal",

@@ -8,8 +8,8 @@ module.exports = {
     userInterfaceStyle: "light",
     splash: {
       image: "./assets/splash.png",
-      resizeMode: "contain",
-      backgroundColor: "#ffffff",
+      resizeMode: "cover",
+      backgroundColor: "#8b4e85",
     },
     assetBundlePatterns: ["**/*"],
     scheme: "truesnap",
