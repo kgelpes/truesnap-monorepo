@@ -219,6 +219,9 @@ async function main() {
         // Error if does not exist (means photo is not verified)
         console.log("does not exist!");
         deleteImage();
+        return res.status(400).json({
+          message: "Image is not verified.",
+        });
       }
     } catch (error) {
       console.error(`Error uploading photo: ${error}`);
